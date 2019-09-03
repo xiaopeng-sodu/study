@@ -1,0 +1,74 @@
+
+   部署的时候，master服务器使用cluster_master.lua    slave服务器使用cluster_slave.lua ， 不管主服务器还是从服务器，都只需要改动配置文件；(config 配置各不相同） (start.sh , stop.sh , update.sh  cluster_config 配置一份，同步就好）
+
+   新增文件： cluster_slave.lua（从）    cluster_master.lua（主）      uilt.lua（工具）         log.lua（日志）
+   
+   修改文件： main.lua    cluster.lua(添加了list_server函数)     clusterd.lua(添加了list_server函数）
+ 
+   配置文件： cluster_config(配置主从服务器的ip， port)
+                    config（添加几个选项）
+  
+   脚本文件：start.sh(启动服务器配置）   stop.sh(停服配置）
+
+1. config 添加选项  （总共添加3个选项）
+   master_flag = true  (主从服务器标志， true表示主服务器, false表示从服务器）
+   cluster = root.."game/cluster_config"  (集群的配置）
+   cluster_node = "master" (当前节点的名称， 例如：主服务器填master,  从服务器1 填slave_1， 具体的名字看cluster_config里的配置名字）
+
+2. cluster_config 配置
+    例如： master = "127.0.0.1:11888"  （表示主服务器的ip， port）
+
+              slave_1 = "127.0.0.1:12888"   （表示从服务器的ip， port）
+
+              login_1 = "127.0.0.1:13888"   （表示登录服务器的ip， port）
+
+2.当前目录下添加脚本，（ 集群服务器的启动和终止通过脚本远程控制）
+  start.sh 例如： cd  /root/server1  ./skynet game/config
+
+  stop.sh  例如： killall skynet (关掉所有的skynet进程）
+
+  update.sh （现在是基于svn的情况下更新，这样更新的效率最高，不容易出错）
+
+3.使用方法
+     1. 在主服务器上，telnet 127.0.0.1 port(控制台的端口）例如： telnet 127.0.0.1 8000  （port是在config里面配置的debug_port，在main.lua里面已经监听了这个端口）
+     2. 先输入 list命令 （列出所有服务）
+     3. 找到cluster_master 服务地址, 例如：0014
+     4. 在cluster_master 里面有一个skynet.info_func（）, 例如：输入info :0014  list 会调用对应的list命令
+     5. 命令如下：
+         	info 0014 list    列出所有服务器的ip port  
+
+	info 0014 start_all    启动所有服务器（调用start.sh脚本）
+	
+	info 0014 stop_all   关闭所有的服务器（除了master服务器外）
+	
+	info 0014 stop slave_1    关闭单个服务器进程
+
+	info 0014 update   更新服务器代码
+          
+   	info 0014 cpu   列出所有服务的cpu使用率
+            
+	info 0014 cpu slave_1   列出节点slave_1的cpu使用率
+
+	info 0014 mem  列出所有服务器的内存使用率
+
+	info 0014 mem slave_1   列出节点slave_1的内存使用率
+
+	info 0014 vmstat  列出所有服务器的（内存， 进程队列， 中断情况， 上下文切换， cpu的使用情况）
+
+	info 0014 vmstat slave_1   同上，只列出节点slave_1
+
+	info 0014 netstat   列出所有服务器的连接情况（ 和真实的在线人数有点区别 ）
+
+	info 0014 netstat slave_1   列出单台服务器的连接情况
+
+	info 0014  free  列出所有服务器的内存使用情况
+
+	info 0014 free slave_1 列出单台服务器的内存使用情况
+
+	info 0014 disc    列出所有服务器的磁盘使用情况
+
+	info 0014 disc slave_1  列出单台服务器的磁盘使用情况
+
+      注:
+             统计各个服务器的在线人数，需要提供内部接口，才能显示
+
