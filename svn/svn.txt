@@ -1,0 +1,9 @@
+svn的使用总结：
+1， svn删掉文件方法。
+    1,  删掉远程服务器文件
+         svn delete svn://download.newphison.com/server_3d/game/changshamj.lua  -m "delete xxx"
+    2,  删掉本地文件， 然后提交
+         svn delete changshamjroom.lua   然后， svn ci -m "delete xx" 
+
+
+2. 
