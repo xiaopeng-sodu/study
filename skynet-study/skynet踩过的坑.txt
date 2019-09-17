@@ -18,16 +18,24 @@
     yum install -y readline.
 
 4. skynet 的配置（采坑）
-    root="./"    #根目录为当前目录
-    thread = 8   #配置线程数
-    start = "main"  #lua层启动的主函数， 若没有start=“main”的配置， 系统默认启动main.lua
+    root="./"
+    thread = 8
+    start = "main"
     logpath = "."
     harbor = 0
-    lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua;"..root.."svr_db/?.lua;"..root.."svt_uilt/?.lua"  #lua服务的目录
-    lua_cpath = root.."luaclib/.so"  #供lua使用的c库
+    lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua;"..root.."svr_db/?.lua;"..root.."svt_uilt/?.lua"
+    lua_cpath = root.."luaclib/.so"
     lualoader = root.."lualib/loader.lua"
     luaservice = root.."service/?.lua;"..root.."test/?.lua;"..root.."svr_db/?.lua;"..root.."svr_uilt/?.lua"
     cpath = root.."cservice/?.so"
     cluster = root.."cluser_config/cluster" #决定了集群配置的路径
+
+5. 遇到一个奇怪的问题。 
+   skynet里面。 
+   使用dbformat() 无法写数据库， 使用string.format() 可以写数据库。 对于同一条语句只需要换对换一下。 
+   而且使用dbformat，报语法错误。 
+   在此记录一下，以便以后查找问题。 
+   
+
     
     
