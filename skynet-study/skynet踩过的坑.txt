@@ -1,0 +1,33 @@
+1. mysql 库。
+  local function on_connect(db)
+ 	db:query("set charset utf-8")
+  end
+  错误："set charset utf8"
+  正确：“utf-8”, 错误：“utf8”
+  
+  格式化时：正确：'%s'，  错误：%s, 必须使用单引号括起来。
+
+2.热更
+  telnet 127.0.0.1 8000
+  list 找到agent_manager服务的id
+  info 011 clear 
+  lua test.lua 20190801 # 客户端的热更新 
+
+3. 编译skynet 
+    yum install -y autoconf
+    yum install -y readline.
+
+4. skynet 的配置（采坑）
+    root="./"    #根目录为当前目录
+    thread = 8   #配置线程数
+    start = "main"  #lua层启动的主函数， 若没有start=“main”的配置， 系统默认启动main.lua
+    logpath = "."
+    harbor = 0
+    lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua;"..root.."svr_db/?.lua;"..root.."svt_uilt/?.lua"  #lua服务的目录
+    lua_cpath = root.."luaclib/.so"  #供lua使用的c库
+    lualoader = root.."lualib/loader.lua"
+    luaservice = root.."service/?.lua;"..root.."test/?.lua;"..root.."svr_db/?.lua;"..root.."svr_uilt/?.lua"
+    cpath = root.."cservice/?.so"
+    cluster = root.."cluser_config/cluster" #决定了集群配置的路径
+    
+    
