@@ -1,0 +1,12 @@
+1,  mysql导出数据库的几种方法。
+     mysqldump -uroot -p123456 db_name >db_name.sql 
+
+
+
+2. mysql修改索引
+    create index index_name on table(column_name);   
+    alter table tablename add index  index_name(column_name); 
+
+
+
+  select version(); #查看版本；
