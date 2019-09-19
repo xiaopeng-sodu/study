@@ -1,0 +1,24 @@
+#!/bin/bash
+export MONGO_HOME=/usr/local/mongodb
+#chkconfig:2345 20 90
+#description:mongod
+#processname:mongod
+
+case $1 in
+	start)
+		mongod --config $MONGO_HOME/mongodb.conf
+		;;
+	stop)
+		mongod --shutdown --config $MONGO_HOME/mongodb.conf
+		;;
+	status)
+		ps -ef|grep mongodb
+		;;
+	restart)
+		mongod --shutdown --config $MONGO_HOME/mongodb.conf
+		mongod --config $MONGO_HOME/mongodb.conf
+		;;
+	*)
+		echo "enter start|stop|status|restart"
+		;;
+esac
