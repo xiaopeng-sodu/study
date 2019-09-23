@@ -10,3 +10,8 @@
 
 
   select version(); #查看版本；
+
+  建表的时候在设置有auto_increment 的行， 不要设置该行为默认值， 否则报错。 
+  例如。 userid int unsigned not null auto_increment comment "xxx"  正确；
+            userid int unsigned not null default 0 auto_increment comment "xxx  错误； 
+ 
