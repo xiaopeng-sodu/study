@@ -1,4 +1,4 @@
-ln -s   /root/redis/redis-benchmark    /usr/local/bin/redis-benchmark  //建立软连接
+ln -s   /root/redis/redis-benchmark    /usr/local/bin/redis-benchmark    ## 建立软连接
 redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 100000 > redis_benchmark.txt  // 重定向  
 
 1。 ssh 
@@ -35,6 +35,57 @@ redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 100000 > redis_benchmark.txt  // 
     dir 需要改成自己想放的路径， 例如:  dir = "/var/run", dbfilename  dump_6379.rdb,  appendfilename "appendonly_6379.aof"
     这置软连接（注意拼写）， 例如：
     ln   -s    /root/redis-5.0.5/src/redis-server    /usr/bin/redis-server  等等
+
+7. mariadb的安装
+   yum install -y maridb
+   yum install -y mariadb-server 
+   service  mariadb start 
+   systemctl enable mariadb 
+   修改mysql的密码：mysqladmin -uroot -p password "123456" // “123456”是新密码， 
+              或者  mysql -uroot -p,   然后， set password for root@localhost password = (‘123456’）
+
+8.  hostnamectl   set-hostname  newhostname    #设置linux主机名
+     hostnamectl  或者 hostnamectl  status   #查看linux主机名
+
+    passwd  #修改用户密码
+
+    tcping 命令 ，非自带， 需要安装， yum install -y tcping , 类似ping。 但是可以检查服务器的端口是否打开。
+     例如: tcping   game.newphison.com  80   #  查看服务器game.newphison.com 的端口80 是否使用。 
+
+    df  命令。  df -h   ,  df -hT， df -hv   #查看磁盘的使用率 
+    du 命令。  du -sh  /*  #查看根目录下的磁盘使用情况  #显示第一层目录包含的所有文件的大小， 不显示子目录。 
+                     du -ha /*  #显示每一个文件的大小。 
+                     du -hc /*  #显示每一个文件的大小，以及总大小。 
+                     -h  以友好的方式显示。   -a  显示每一个文件的大小，  -c   显示每一个文件的大小 ， 以及显示总大小。 
+                    -b  字节，  -k  1024byte,  -m  M计算。 
+
+     firewalld  -- 防火墙。 
+     systemctl start firewalld  , systemctl restart firewalld ,   systemctl enable firewalld,   systemctl disable firewalld
+     firewall-cmd --zone=public --add-port=6379/tcp --add-port=6380/tcp --permanent  # 永久开放端口6379， 6380
+     firewall-cmd --state  #显示状态。 
+     firewall-cmd --get-active-zones  #查看区域信息。 
+     firewall-cmd --reload #更新防火墙规则。 更新防火墙规则之后， 必须使用firewall-cmd --reload 这样才能生效。 
+     firewall-cmd  --zone=public --list-ports  #列出所有开放的端口。 
+     firewall-cmd  --zone=public --list-service  #列出所有的服务。 
+     firewall-cmd   --zone=public --add-port=5679-5689/tcp  --permanet  #  开放5679-5689的所有端口。 
+     firewall-cmd  --get-active-zones   #查看当前zones
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     
 
