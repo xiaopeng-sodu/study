@@ -1,26 +1,25 @@
 1. limit。
    select * from tbl limit OFFSET , offset;   
-   OFFET 表示偏移量。 offset 表示偏移的最大行数(就是要输出的行数）。 
-   表示从第一行开始，偏移OFFSET后， 选取offset行的输数据。 
-   OFFSET+1 ~ offset 之间的数据显示。
-   select   *   from  test_tbl   limit   5;    # 表示取前5行的数据。 
-   select  * from test_tbl  limit 5,  10;   #表示取 6- 15行的数据。 
-   select * from  test_tbl limit 10, -1;   #表示取11 ~ 最后一行的数据。 
+   OFFSET 表示偏移量。 offset 表示偏移的最大行数(就是要输出的行数）。 
+   表示从第一行开始，偏移OFFSET后， 选取offset行的数据， 即输出的总行数为offset。
+   也就是选取   OFFSET+1 ~ offset    之间的数据显示。
+   select  *  from  test_tbl  limit  5;    # 表示取前5行的数据。 
+   select  *  from  test_tbl  limit  5,  10;   #表示取 6 ~ 15行的数据。 
+   select  *  from  test_tbl  limit  10, -1;   #表示取11 ~ 最后一行的数据。 
 
 2. 数据类型decimal(n, m).  
-    decimal用于精确度很高的情况， 例如money等。 n表示数据总位数， m表示小数点的位数。 
-    money   decimal  not null,  # 这种情况下默认为（10,2）# 表示总数据位为10， 小数点占有2位。
+    decimal用于精确度很高的情况， 例如money等。 n表示数据总位数（包括整数位和小数位之和） ， m表示小数点的位数 。 
+    money   decimal  not null,  # 这种情况下默认为（10,2）# 表示总数据位为10， 小数位占2位。
     money   decimal(20,4) not null,  # 表示总数据位为20位， 小数位占有4位。 
 
-3. order by  按照指定的方式排序
-    select *  from  shop order by id desc;  # shop表所有的数据按照降序排序。 
-    select  *   from  users  order by  userid desc  limit 5;   #users表按照userid降序排列，然后去前面5个数据。 
-
+3. order by  按照指定的方式排序， 默认为升序。 desc 表示降序。 
+    select  *  from  shop  order by id desc;  # shop表所有的数据按照降序排序。 
+    select  *  from  users  order by  userid desc  limit 5;   #users表按照userid降序排列，然后取5行数据。  
 
 4. mysql的时间类型。 
-   timestamp # 4个字节，  1970-01-01 00:00:00 ~ 2038-12-31 23:59:59  混合时间， 时间值
-   datetime #8个字节， 1000-01-01 00:00:00 ~  9999-12-31 23:59:59   混合时间 ， 时间值
-   date #3个字节， 1000-01-01 ~ 9999-12-31 日期值
+   timestamp  # 4个字节，  1970-01-01 00:00:00 ~ 2038-12-31 23:59:59  混合时间， 时间值
+   datetime  # 8个字节， 1000-01-01 00:00:00 ~  9999-12-31 23:59:59   混合时间 ， 时间值， 相比timestamp，datetime的范围更广。
+   date #3个字节， 1000-01-01 ~ 9999-12-31 日期值，年月日 
    time  # 3个字节 ， ‘-838:59:59’~ '838:59:59'   时间值或者持续时间
    year  # 1个字节， 1901 ~ 2155   年份
    在lua里使用mysql语句插入时，以上类型以字符串的形式插入。 
@@ -30,3 +29,7 @@
    sql = dbformat([[insert into test_db(create_time, create_timestamp) values(%s, %s)]], time, timestamp)
    db_query(sql, 1); 
 
+5. left join ,  right join , inner join 外连接。 
+   select a.userid, a.name, a.nick, b.id, b.date from test_join_tbl a left join test_join_tbl_1 b on a.userid = b.id limit 5; 
+   select a.userid, a.name, a.nick, b.id, b.date from test_join_tbl a right join test_join_tbl_1 b on a.userid = b.id limit 5; 
+   select a.userid, a.name, a.nick, b.id, b.date from test_join_tbl a inner join test_join_tbl_1 b on a.userid = b.id  limit 5; 
