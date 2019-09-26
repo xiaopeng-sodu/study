@@ -71,6 +71,19 @@ redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 100000 > redis_benchmark.txt  // 
      firewall-cmd  --zone=public --list-service  #列出所有的服务。 
      firewall-cmd   --zone=public --add-port=5679-5689/tcp  --permanet  #  开放5679-5689的所有端口。 
      firewall-cmd  --get-active-zones   #查看当前zones
+
+10. find 命令
+    find + 目录 + 参数
+    find  / -name  mysql*   #在根目录下查找名为 mysql前缀的文件和文件夹
+    find  / -type f  #查找普通文件
+    find  / -type b #查找块设备
+    find  / -type s  #查找套接字
+    find  / -type d  #查找目录
+    find  / -type p  #查找管道
+
+    find / -size 20k  #查找20k大小的文件
+    find / -size +20k  #查找大于20k大小的文件
+    find / -size -20k #查找小于20k大小的文件
      
 
 
