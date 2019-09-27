@@ -1,0 +1,41 @@
+1. mysql 库。
+  local function on_connect(db)
+ 	db:query("set charset utf-8")
+  end
+  错误："set charset utf8"
+  正确：“utf-8”, 错误：“utf8”
+  
+  格式化时：正确：'%s'，  错误：%s, 必须使用单引号括起来。
+
+2.热更
+  telnet 127.0.0.1 8000
+  list 找到agent_manager服务的id
+  info 011 clear 
+  lua test.lua 20190801 # 客户端的热更新 
+
+3. 编译skynet 
+    yum install -y autoconf
+    yum install -y readline.
+
+4. skynet 的配置（采坑）
+    root="./"
+    thread = 8
+    start = "main"
+    logpath = "."
+    harbor = 0
+    lua_path = root.."lualib/?.lua;"..root.."lualib/?/init.lua;"..root.."svr_db/?.lua;"..root.."svt_uilt/?.lua"
+    lua_cpath = root.."luaclib/.so"
+    lualoader = root.."lualib/loader.lua"
+    luaservice = root.."service/?.lua;"..root.."test/?.lua;"..root.."svr_db/?.lua;"..root.."svr_uilt/?.lua"
+    cpath = root.."cservice/?.so"
+    cluster = root.."cluser_config/cluster" #决定了集群配置的路径
+
+5. 遇到一个奇怪的问题。 
+   skynet里面。 
+   使用dbformat() 无法写数据库， 使用string.format() 可以写数据库。 对于同一条语句只需要换对换一下。 
+   而且使用dbformat，报语法错误。 
+   在此记录一下，以便以后查找问题。 
+   
+
+    
+    

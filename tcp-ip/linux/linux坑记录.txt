@@ -1,0 +1,7 @@
+1. vm报错， 将安装目录下的xx.vmx文件里的vmci0.present = "FALSE"
+2. windows系统里面的服务vm anthor server 开成自动重启， windows重启
+参考博客：https://blog.csdn.net/w462666131/article/details/89914381
+3.修改分辨率，进入设置。推荐1360 * 768（16:9）
+4. 虚拟机开机黑屏的解决方案：
+   以管理者身份运行cmd， 输入netsh winsock reset
+   或者 虚拟机->设置->显示器->3d勾上

@@ -1,0 +1,8 @@
+1、list命令
+help list    显示list的帮助信息
+show listsize  列出显示的行数
+set listsize num 设置显示行数的额数目
+list linenum  指定查看某一行的代码，默认以该行为中心显示出来
+list linestart, lineend   指定查看某一段代码
+list file:function  查看某一个文件的某一个函数， 例如 list   skynet_server.h ： skynet_socket_poll ,     list skynet_socket.c : forward_message
+list file:linenum  查看某一个文件的某一个行的附件代码， 例如：list  skynet_server:10

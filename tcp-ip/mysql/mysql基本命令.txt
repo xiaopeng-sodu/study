@@ -1,0 +1,17 @@
+1,  mysql导出数据库的几种方法。
+     mysqldump -uroot -p123456 db_name >db_name.sql 
+
+
+
+2. mysql修改索引
+    create index index_name on table(column_name);   
+    alter table tablename add index  index_name(column_name); 
+
+
+
+  select version(); #查看版本；
+
+  建表的时候在设置有auto_increment 的行， 不要设置该行为默认值， 否则报错。 
+  例如。 userid int unsigned not null auto_increment comment "xxx"  正确；
+            userid int unsigned not null default 0 auto_increment comment "xxx  错误； 
+ 

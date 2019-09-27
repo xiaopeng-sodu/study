@@ -1,0 +1,215 @@
+配置文件  
+/etc/redis/redis_6379.conf
+info replication  查看redis服务主从复制的状态  
+
+1.主从切换
+  redis-cli -h 127.0.0.1 -p 6379,  连接上redis服务器， info replication 查看 redis的主从复制状态， slaveof no one 解除主从关系， 
+  
+  在slave端执行slaveof no one ，再使用info replication     ### 这时slave服务器变成了master服务器， 解除了主从关系
+  在slave段执行slaveof masterip   masterport   ### 指定主服务器的ip，port
+  slaveof no one 断开主从复制的关系， 不会删掉已有的数据， 只是不再接受主节点的数据同步
+  增量复制和全量复制满足的条件；
+
+  主从复制的缺陷：
+  master故障， 写操作停止，需要手动将slave提升为master ，在slave的客户端执行slaveof no one , 解除之前的主动关系， 提升为master
+  其他从服务器需要在客户端执行slaveof masterip masterport  ，指定新的主服务器ip 和 端口； 故障master重新接入，会自动作为从服务器
+  并且默认master为新提升为主服务器的ip，port；
+
+  主从复制解决了服务器读操作的压力， 从服务器只负责读操作， 主服务器负责读写操作。适用场景写少读多，例如电商；实现了读的负载均衡 ；
+  缺点：没有实现写的负载均衡； 写服务器的压力比较大的情况不适用； 没有实现故障的自动转移， 需要手动slaveof 操作； 单节点的写入必然
+  造成写服务器的压力。
+
+  为了提高redis的高可用的性能，引进了哨兵机制和集群机制； 
+
+  主从复制是高可用方案哨兵和集群的基础；
+
+  单哨兵+主从复制， 多哨兵+主从复制
+
+  主从复制的3种方法：
+  1,  启动服务器redis-server  /etc/redis/redis_6379.conf, 然后， 连接服务器， redis-cli -h 127.0.0.1 -p 6379, 执行slaveof no one 解除
+       主从关系， 执行slaveof   masterip     masterport , 指定主服务器 
+  2，启动服务器时 执行 redis-server /etc/redis/redis_6379.conf  --slaveof  masterip   masterport
+  3，在redis.conf 里面添加  slaveof masterip  masterport   例如  slaveof   127.0.0.1   6379  
+
+2.redis的配置 redis.conf
+bind 0.0.0.1 / bind 127.0.0.1 / bind ip   ####配置ip 
+port 6379   #配置端口
+daemonize yes   #放在后台运行
+pidfile "/var/run/redis_6380.pid"      ###redis的进程id的目录
+logfile "/var/run/log/log-6380.log"   ###redis的日志目录
+
+redis-cli -h 127.0.0.1 -p 6380     ####指定连接哪一台服务器 
+
+############  主从复制配置   #############
+repl-disable-tcp-nodelay   no  ### no 表示不执行TCP_NODELAY 选项， 内核不对包进行合并；设置为no， 增加了带宽的压力，减少了网络延迟
+
+3. 命令
+redis-cli -h ip -p port  连接服务器
+info ####显示所有信息
+info replication   ###显示主从复制信息
+info cluster  ###显示集群信息
+info cpu    ###显示cpu信息
+info memory  ###显示内存信息
+
+ping #### 验证服务器是否连通
+从节点发送ping命令， 返回PONG ，表示连接正常 
+
+4. 哨兵
+   为了解决主从复制的故障不能自动转移， 容灾不佳的情况， 增加哨兵机制； 
+   哨兵的两个作用：
+   1,   哨兵监控主服务器和从服务器的运行状态，通过发送命令实现； 
+   2， 哨兵监控到master宕机之后， 将其中一台slave提升为master服务器， 且通过发布订阅模式来通知其他slave服务器来修改配置， 切换
+         成新的主从关系；
+         例如：sentinel monitor mymaster 127.0.0.1 6380 2    master 服务器127.0.0.1 6380 宕机了， 哨兵会选举新的master服务器, 假如是
+    sentinel monitor mymaster 127.0.0.1 6379 2 ， 则所有哨兵服务器的配置都会修改成sentinel monitor mymaster 127.0.0.1 6379 2
+
+   哨兵是独立的进程； 哨兵是分布式系统， 单节点的哨兵不具备容灾功能；部署多个哨兵来监控主从服务器的运行状态，提高哨兵功能的健壮性；
+   哨兵的配置：sentinel_26379.conf 配置  独立于redis_6379.conf
+   port 26380  ### 哨兵进程监听端口
+   daemonize yes    ### yes 放置在后台运行，守护进程
+   pidfile  “/var/run/redis-sentinel_26380.pid”  ### 进程id的配置文件目录
+   logfile    "/var/run/sentinel_26380.log"  ### 日志文件的目录文件
+   sentinel monitor mymaster 127.0.0.1 6380 2  ### 监控的主服务器， quonum= 2
+   sentinel down-after-milliseconds mymaster  3000   ### 探测3s没反应，则默许服务器挂掉
+   sentinel failover-timeout  mymaster  18000    #### 选主超时时间18s 
+   protected-mode no  ### 非保护模式
+
+   两种情况：
+   1，主127.0.0.1:6379,   从127.0.0.1:6380,   从 127.0.0.1:6381
+        将哨兵的集群配置sentinel_6379.conf  sentinel_6380.conf  sentinel_6381.conf  全部监控 sentinel monitor mymaster 127.0.0.1 6379 2
+        关闭6379端口的进程， 则自动选择一台从服务器来作为master服务器， 同时sentinel_xxx.conf 自动改成 sentinel monitor mymaster 
+        127.0.0.1 6380/6381 2, 所有哨兵服务器的配置都会修改 ；
+
+    2，主127.0.0.1:6379  从127.0.0.1:6380  从 127.0.0.1:6381
+         将sentinel_6379.conf 的配置改成 sentinel monitor 127.0.0.1 6379 2 
+         将sentinel_6380.conf 的配置改成 sentinel monitor 127.0.0.1 6380 2
+         将sentinel_6381.conf 的配置改成 sentinel monitor 127.0.0.1 6380 2
+         关闭6379， 则选举一台从服务器作为master， 同时修改sentinel_xx.conf 的配置为 sentinel monitor newmasterip port 2
+
+5. 持久化的两种方案。
+    aof持久化。
+    配置。
+    appendonly  yes   #### yes  打开 ; no 关闭；
+    appendfilename    "appendonly_6379.aof"    ####  aof持久化的文件
+    ###持久化的策略 ,3种策略只能选一条
+    appendfsync   always    # 对于每一次写入改动都会同步到磁盘， 性能极差；但是， 数据是最完整的； 
+    appendfsync  everysec    #   每隔一秒，写入磁盘一次， 综合考虑性能和数据的完整性，折中方案， 最佳方案； 
+    appendfsync   no    #  不主动实行同步操作，有系统控制，一般是30s， 速度最快， 数据的完整性最差； 
+    auto-aof-rewrite-percentage   100   ## 当前aof文件超过上一次重写时aof文件大小的百分比就会重写
+    auto-aof-rewrite-min-size 64m   ### 允许重写的最小的aof文件的大小
+    redis-check-aof   ##文件修复
+
+    rdb持久化。
+    配置。
+    save   900  1   ## 表示900s内至少有一个key变化，则落地
+    save   300  10   ##  表示300s内至少有10个key变化， 则落地
+    save   60  10000  ## 表示60s内至少10000key变化，则落地
+    stop-writes-on-bgsave-error  yes   ###  默认为yes
+    rdbcompression  yes  ## 对于磁盘的快照是否进行压缩存储， yes会采用lzf算法压缩， 会消耗cpu， 如果不想消耗cpu，则关闭； 
+    rdbchecksum  yes   ###默认yes，  redis使用CRC64算法进行数据校验， 会增加10%的性能消耗， 希望取得较大的性能，关闭； 
+    dbfilename   "dump-6379.rdb"   ### 快照文件
+    手动触发。
+    save。 ### 会阻塞redis服务器
+    bgsave。### 推荐用法，会fork一个子进程， 不会阻塞redis服务器的正常运行
+
+6. redis的集群  cluster
+    配置。
+    cluster-enabled  yes  # 集群开关
+    cluster-config-file "nodes-6379.conf"   ## 集群配置文件
+    cluster-node-timeout   15000   ##集群节点之间支持最长的响应时间
+    注释 # bind 127.0.0.1
+    注释 # appendonly yes
+    集群至少有3主3从 
+    创建集群的命令：redis-cli  --clustser  create 127.0.0.1:6379  127.0.0.1:6380 127.0.0.1:6381  127.0.0.1:6382 127.0.0.1:6382 127.0.0.1:6383 --replicas 1
+    客户端连接：redis-cli -c -h 127.0.0.1 -p 6379
+
+7. redis的雪崩和缓存击穿的解决方案； 
+   缓存击穿：设置了过期时间的key，在一段时候之后失效了， 而在某个时间点被高并发的访问，这个key就是一个热点数据。由于缓存的key已经失效, 
+   结果直接从数据库中查找， 大量的并发请求瞬间压垮了数据库； 
+   解决方案：使用互斥锁排队；将数据的有效时间设置的更长；
+   缓存穿透：查询一个不存在的数据， 缓存中找不到，直接落到db中查询， 缓存失去了意义， 缓存中没有保留数据，直接穿透缓存。
+   解决方案：做一个过滤器， 当查询的数目不存在时，在缓存中设置对应的key值；
+   缓存雪崩：一系列的缓存数据在同一时间段失效， 大并发请求这些缓存数据， 缓存中已经没有了这些数据， 直接落到db中查询， 瞬间压垮数据库；
+   解决方案：随机设置缓存数据的有效时间。
+
+   雪崩强调在某一时间段，缓存数据集中失效， 有多个数据失效， 直接从db中查找数据， 瞬间击垮数据库；
+   击穿强调是某一个缓存数据失效，突然被大量的高并发访问， 高并发访问数据库， 击垮数据库；
+
+   过期的雪崩并不是致命的，缓存服务的某个节点宕机或者断网， 才是致命的； 
+
+   不管是穿透， 击穿， 雪崩， 都是因为大量的高并发无法直接从缓存中找到数据；
+
+   redis作为缓存对数据的查询带来了极大的效率， 缺陷是数据的一致性不好，这也是一个无解的问题， 如果要求强一致性的应用场景，不要使用redis。
+另外的一个问题是雪崩， 缓存穿透， 缓存击穿。
+
+   查询流程：
+     	// 从缓存中查找， 找到直接返回  
+   	if ( redis.getValue( key ) ) 
+		return obj; 
+
+	// 从数据库查找
+	if ( mysql.query( key ) 
+		//找到， 将数据设置在缓存
+		redis.setValue( key , value) 
+	return obj; 
+
+   
+8. 分布式锁；
+
+
+9. redis的数据类型及各自的应用场景。  //参考博客：https://www.jianshu.com/p/0f867e5dd5d6
+	
+   string。key:value
+   用于一些热点数据的计数。
+
+   set key value 
+   get key
+   mset key1 value1  key2 value2 key3 value3
+   mget key1 key2 key3
+   setnx key value  //key不存在的时候，设置成功；否则，失败
+   msetnx key1 value1  key2 value2 key3 value3
+   setex key seconds value   // 设置key的有效时间
+   incr key  // 自增
+   incrby key num  //增加 num
+   decr  key  // 自减
+   decrby key num // 减少 num
+   setrange key start end value //替换字符， 在start- end
+   getset key newvalue //返回key之前的值，然后设置key 为newvalue
+   strlen key 
+   append key vaule // 追加
+
+   list。链表
+
+   用于分页等。
+   索引从0开始， 例如. lindex(key, 0) , lindex(key, 1), lindex(key, 2)，从左到右
+
+   lpush key value1 value2 ...
+   lpop key
+   rpush key value1 value2 ..
+   rpop key
+   llen key // key 的长度
+   linsert key before/after value newvalue // 在value之前或者之后， 插入newvalue
+   lrem key count value // 删掉count个value元素， count > 0 从开始位置删掉， count < 0 从末尾开始删
+   ltrim key start end  // 截取start 到end之间的元素， 初次之外都删掉
+   rpoplpush key1 key2 // 从key1 的右边弹出， 将该元素从key2的左边压入
+   lindex key index //索引从左至右， 从0开始
+   lset key index newvalue
+
+   hash。哈希
+   
+   hset key field value 
+   hget key field
+   hmset key field1 value1 feild2 value2 field3 value3
+   hmget key field1 ...
+   hgetall key
+   hvalues key
+   hkeys key
+   hincrby key field count 
+   hincrbyfloat key field count
+   hdel key field1 field2 ...
+   hsetnx key field1 value1
+   hexists key field
+   hlen key 
+   
+   
+      

@@ -1,0 +1,19 @@
+1.mongodb的安装不需要编译，（不同于redis）
+2.下载安装包， tar -xzvf   xxx.tar
+   cd /usr/local  
+    cp -r  解压的安装包   /usr/loca/
+    mv xx mongodb
+    cd mongodb
+    mkdir data 或者 cd data , mkdir db  
+    mkdir logs , touch mongodb.log
+    touch mongodb.conf
+    配置的内容：
+    dbpath=/usr/local/mongodb/data
+    logpath=/usr/local/mongodb/logs/mongodb.log
+    port=27017
+    fork=true
+    auth=false
+    bind_ip=0.0.0.1
+     启动：mongd -f /usr/local/mongodb/mongodb.conf
+              启动失败：先删掉mongodb.lock, 然后  mongd -f ./mongodb.conf --repair, mongod -f  ./mongodb.conf
+

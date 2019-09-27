@@ -1,0 +1,107 @@
+ln -s   /root/redis/redis-benchmark    /usr/local/bin/redis-benchmark    ## 建立软连接
+redis-benchmark -h 127.0.0.1 -p 6379 -c 100 -n 100000 > redis_benchmark.txt  // 重定向  
+
+1。 ssh 
+      ssh-keygen // 生成秘钥， 一直按enter   
+      ssh-copy-id   -i    /root/.ssh/id_rsa.pub    root@game.newphison.com/root  //免密登录
+      ls -a, cd .ssh
+
+2。 centos7 ping不同外网， 可以ping通8.8.8.8
+      vim /etc/resovle.conf   添加   nameserver 8.8.8.8
+      service NetworkManager stop     systemctl disable NetworkManager 
+      service firewalld stop  systemctl  disabale firewalld   // 关闭防火墙
+
+3. svn 的使用。 
+   svn co svn://downloand.newphison.com/server_3d
+   yum install -y svn  // 安装svn
+   svn --version   //查看svn的版本
+   
+4. git 的使用
+    yum install  -y git
+    git --verion  // 查看git的版本
+    git branch // 查看版本
+    git  checkout -b v1.7 origin/v1.6
+
+5. sublime 的安装
+   wget  https://download.sublimetext.com/sublime_text_3_build_3207_x64.tar.bz2
+   tar vxjf subliem.....
+   ln -s  /opt/sublime_text_3/sublime_text   /usr/bin/subl      // 创建软连接需要使用绝对路径， 使用相对路径无效
+   错误用法： ln -s   ./sublime_text  /usr/bin/subl    
+
+6. redis的安装
+    wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+    tar xzvf redis.tar.gz
+    cd src  
+    make // 如果报错， 执行 make MALLOC=libc
+    dir 需要改成自己想放的路径， 例如:  dir = "/var/run", dbfilename  dump_6379.rdb,  appendfilename "appendonly_6379.aof"
+    这置软连接（注意拼写）， 例如：
+    ln   -s    /root/redis-5.0.5/src/redis-server    /usr/bin/redis-server  等等
+
+7. mariadb的安装
+   yum install -y maridb
+   yum install -y mariadb-server 
+   service  mariadb start 
+   systemctl enable mariadb 
+   修改mysql的密码：mysqladmin -uroot -p password "123456" // “123456”是新密码， 
+              或者  mysql -uroot -p,   然后， set password for root@localhost password = (‘123456’）
+
+8.   hostnamectl   set-hostname  newhostname    #设置linux主机名
+     hostnamectl  或者 hostnamectl  status   #查看linux主机名
+
+    passwd  #修改用户密码
+
+    tcping 命令 ，非自带， 需要安装， yum install -y tcping , 类似ping。 但是可以检查服务器的端口是否打开。
+    例如: tcping   game.newphison.com  80   #  查看服务器game.newphison.com 的端口80 是否使用， 是否开启。 
+
+    df  命令。  df -h   ,  df -hT， df -hv   #查看磁盘的使用率 
+    du 命令。  du -sh  /*  #查看根目录下的磁盘使用情况  #显示第一层目录包含的所有文件的大小， 不显示子目录。 
+                     du -ha /*  #显示每一个文件的大小。 
+                     du -hc /*  #显示每一个文件的大小，以及总大小。 
+                     -h  以友好的方式显示。   -a  显示每一个文件的大小，  -c   显示每一个文件的大小 ， 以及显示总大小。 
+                     -b  字节，  -k  1024byte,    -m  M计算。 
+
+  9.   firewalld  -- 防火墙。 
+     systemctl start firewalld  , systemctl restart firewalld ,   systemctl enable firewalld,   systemctl disable firewalld
+     service firewalld start , service firewalld restart  ,  service firewalld enable,   service firewalld disable
+     firewall-cmd --zone=public --add-port=6379/tcp --add-port=6380/tcp --permanent  # 永久开放端口6379， 6380
+     firewall-cmd --state  #显示状态。 (是开启，还是关闭）
+     firewall-cmd --get-active-zones  #查看区域信息。 
+     firewall-cmd --reload  #更新防火墙规则。 更新防火墙规则之后， 必须使用firewall-cmd --reload 这样才能生效。 
+     firewall-cmd  --zone=public --list-ports  #列出所有开放的端口。 
+     firewall-cmd  --zone=public --list-service  #列出所有的服务。 
+     firewall-cmd   --zone=public --add-port=5679-5689/tcp  --permanet  #  开放5679-5689的所有端口。 
+     firewall-cmd  --get-active-zones   #查看当前zones
+
+10. find 命令
+    find + 目录 + 参数
+    find  / -name  mysql*   #在根目录下查找名为 mysql前缀的文件和文件夹
+    find  / -type f  #查找普通文件
+    find  / -type b #查找块设备
+    find  / -type s  #查找套接字
+    find  / -type d  #查找目录
+    find  / -type p  #查找管道
+
+    find / -size 20k  #查找20k大小的文件
+    find / -size +20k  #查找大于20k大小的文件
+    find / -size -20k #查找小于20k大小的文件
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+

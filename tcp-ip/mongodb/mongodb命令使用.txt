@@ -1,0 +1,21 @@
+db.getCollection("collection").count()   查看数据库空某一个表的数据数量
+db.stats(1024) kb  , db.stats(1024*1024) Mb  ,  db.stats(1024*1024*1024) Gb 查看数据库占用的空间大小
+db.getCollection("base").find({}).sort({"id": -1})   查看某一个表的倒序集合 
+db.serverStatus().globalLock
+db.serverStatus().mem  内存使用情况 
+db.serverStatus().connections
+db.serverStatus().indexCounters
+db.serverStatus().cursors
+db.serverStatus().network
+db.users.ensureIndex({gender:1, user_name:1})  创建索引
+db.users.createIndex({id:1, user_name:1})  创建索引
+db.users.ensureIndex({"userid":1}, {"unique": true})  创建唯一索引
+db.users.getIndexes.find()  查找索引
+db.users.dropIndex("id") 销毁索引
+单个索引、复合索引
+db.users.find({id:100100}).explain("executionStats") 对查询语句的解释
+db.stats() 
+db.base.find().pretty().limit(1)  查看表的成员
+db.currentOp()  查看当前的数据库状态
+db.dropDatabase() 删掉当前数据库
+db.user_info.save({"name": "xiao_peng"}) 建表

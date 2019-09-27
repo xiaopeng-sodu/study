@@ -1,0 +1,39 @@
+1. <sys/epoll.h>  #epoll  IO多路复用技术
+   int epoll_create(int sz); 
+   int epoll_ctl(int epfd, int opt, int sock, struct epoll_event*ev); 
+   int epoll_wait(int epfd, struct epoll_event* evs, int max, int timeout); 
+   opt :  EPOLL_CTL_ADD, EPOLL_CTL_MOD,  EPOLL_CTL_DEL
+   struct epoll_event{
+	int events;  # EPOLLIN  , EPOLLOUT, EPOLLERR, 
+                struct epoll_data data;
+   };
+   struct epoll_data{
+	int fd;
+ 	void *ptr; 
+	uint32  u32; 
+	uint64  u64;
+ };
+
+2. <sys/types.h>  <socket.h>  <unistd.h>  <netinet/in.h> <arpa/inet.h>
+   int socket(int family, int type, int protocol); 
+   int bind(int sock, struct sockaddr* addr, int  len); 
+   int listen(int sock, int backlog); 
+   int accept(int sock, struct sockaddr *addr, int *len); 
+   int connet(int socket, struct sockaddr_int *addr, int len); 
+   struct sockaddr; 
+   struct sockaddr_in; 
+   int htons(short port); 
+   int inet_aton(const char* host, struct sin_addr* addr, int len); 
+   memset(); 
+
+
+3. <netdb.h> 
+   struct addrinfo;
+   int getaddrinfo(const char * host, const char *service, struct addrinfo* ai_hints, struct addrinfo**ai_result); 
+   void freeaddrinfo(struct addrinfo* ai_hints); 
+   int gai_stderror(int errno); 
+
+4. int setsockopt(); 
+
+5. close(), shutdown()的区别。
+
