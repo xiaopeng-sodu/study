@@ -37,3 +37,28 @@
 
 5. close(), shutdown()的区别。
 
+6. 动态链接库dlopen函数的使用。 
+   dlopen, dlsym, dlclose，dlerror。 
+   #include <dlfcn.h>
+   void * dlopen(const char *path, int mode); #以指定的模式打开指定的动态链接库， 并返回一个句柄给调用进程。 
+   调用成功， 返回库引用。 
+   调用失败， 返回NULL。 
+   void * handle = dlopen("xx.so", RTLD_LAZY); 
+   编译时加入 -dl （指定dl库）
+   void *dlsym(void *handle, const char* symbol); # 根据动态链接库句柄handle的操作， 以及链接库的函数名symbol， 返回该函数的地址。 
+   返回结果相当于一个函数指针。 
+   int dlclose(void *handle);  #关闭句柄的动态链接库， 只有动态链接库的使用计数为0时， 才会被系统卸载。 
+   const char * dlerror(void);  #当动态链接库操作函数执行失败时， dlerror返回错误信息， 返回NULL表示函数操作成功。 
+
+
+
+
+
+
+
+
+
+
+
+
+
