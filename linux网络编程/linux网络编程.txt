@@ -2,7 +2,10 @@
    int epoll_create(int sz); 
    int epoll_ctl(int epfd, int opt, int sock, struct epoll_event*ev); 
    int epoll_wait(int epfd, struct epoll_event* evs, int max, int timeout); 
-   opt :  EPOLL_CTL_ADD, EPOLL_CTL_MOD,  EPOLL_CTL_DEL
+   opt 取值：
+   EPOLL_CTL_ADD   # 向监听结构中，添加socket
+   EPOLL_CTL_MOD  # 向监听结构中，修改socket
+   EPOLL_CTL_DEL    #  向监听结构中，删掉socket
    struct epoll_event{
 	int events;  # EPOLLIN  , EPOLLOUT, EPOLLERR, 
                 struct epoll_data data;
@@ -12,7 +15,19 @@
  	void *ptr; 
 	uint32  u32; 
 	uint64  u64;
- };
+    };
+   
+    epoll模型是处理高并发套接字的最佳模型。  对于百万级的套接字， 可能在同一时刻活跃的套接字只有几百或者几千， epoll只专注于活跃的套接字，将对于的
+    socket的缓存从内核态复制到用户态。 
+    epoll_create  这个api 会生成一个红黑树的数据结构rbr  和 一个双向链表的数据结构rdlist。 红黑树用来组织所有的socket， 因为红黑树一个高度平衡的二叉树， 
+    删掉，插入， 搜索是非常高效的操作。 双向链表是一个就绪链表， 对于活跃的socket， 系统将会放入就绪链表。 系统只要关注就绪链表是否为非空，当为非空
+    的时候， 就会通知应用层。 
+    epoll_ctl  这个api 是对socket的添加， 修改， 删掉等操作。 同时会拷贝用户态的数据到内核态， struct epoll_event 数据结构的数据会被拷贝。 
+    epoll_wait  这个api 是用来监听就绪链表是否为非空， 当就绪链表为非空的时候， 就通知应用层。 
+
+    LT ,level-trigger, 水平触发模式 和 ET , edget-trigger， 边缘触发模式。 
+
+    利用epoll模式写一个reactor模型的daemon; 
 
 2. <sys/types.h>  <socket.h>  <unistd.h>  <netinet/in.h> <arpa/inet.h>
    int socket(int family, int type, int protocol); 
@@ -49,6 +64,25 @@
    返回结果相当于一个函数指针。 
    int dlclose(void *handle);  #关闭句柄的动态链接库， 只有动态链接库的使用计数为0时， 才会被系统卸载。 
    const char * dlerror(void);  #当动态链接库操作函数执行失败时， dlerror返回错误信息， 返回NULL表示函数操作成功。 
+
+7. pipe函数。 #include <unistd.h> 
+    int pipe(int pipefd[2]);   # 成功   return 0；  失败， 返回 -1； 
+    pipefd[0]  读端， pipefd[1]  写端； 
+
+8. fcntl函数， 设置sock为非阻塞模式。 #include <fcntl.h>
+    int fcntl(int sock, int cmd); 
+    int fcntl(int sock, int cmd, long arg); 
+    int fcntl(int sock, int cmd, struct flock * lock); 
+    用法比较多的情况：
+    设置为非阻塞模式。
+    flags = fcntl( sock,  F_GETFL, 0);   #获得文件的flags。 
+    flags |= O_NONBLOCK; 
+    fcntl(sock, F_SETFL, flags);  # 将sock 设置为非阻塞模式。 
+    设置为阻塞模。 
+    flags = fcntl( sock, F_GETFL, 0); 
+    flags &= ~O_NONBLOCK; 
+    fcntl(sock, F_SETFL, flags); 
+
 
 
 
