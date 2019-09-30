@@ -25,20 +25,19 @@ else
 
 typedef int(*skynet_cb)(struct skynet_context * ctx, void* ud, int type, int session, int source, void *ud, int size);
 
-
 struct skynet_context {
-	void *instance; 
 	struct skynet_module * mod; 
-	skynet_cb cb; 
-	void *cb_ud; 
-	struct message_queue * queue; 
+	void * instance; 
 	int handle; 
-	FILE *logfile;
+	int ref; 
 	bool init; 
 	bool endless; 
-	int ref; 
-	int session_id; 
+	struct message_queue *queue; 
+	skynet_cb cb; 
+	void * cb_ud; 
 	char result[32];
+	int session_id; 
+	FILE * logfile; 
 
 	CHECKCALLING_DECL
 };

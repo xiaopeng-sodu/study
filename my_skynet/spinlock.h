@@ -1,11 +1,11 @@
 #ifndef spin_lock_t
 #define spin_lock_t
 
-#define SPIN_INIT(q)  spinlock_init(&((q)->lock))
-#define SPIN_LOCK(q)  spinlock_lock(&((q)->lock))
-#define SPIN_UNLOCK(q)  spinlock_unlock(&((q)->lock))
-#define SPIN_TRYLOCK(q)  spinlock_trylock(&((q)->lock))
-#define SPIN_DESTROY(q)  spinlock_destroy((&(q)->lock))
+#define SPIN_INIT(q)  spinlock_init(&((q)->lock));
+#define SPIN_LOCK(q)  spinlock_lock(&((q)->lock));
+#define SPIN_UNLOCK(q)  spinlock_unlock(&((q)->lock));
+#define SPIN_TRYLOCK(q)  spinlock_trylock(&((q)->lock));
+#define SPIN_DESTROY(q)  spinlock_destroy((&(q)->lock));
 
 struct spinlock_t {
 	int lock; 
