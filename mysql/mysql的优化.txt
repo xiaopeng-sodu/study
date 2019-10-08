@@ -1,8 +1,70 @@
-1. mysql 查询优化。
-查询开销指标： 执行时间    检查行数      返回行数
+mysql的性能优化。 
+索引优化， 查询优化， 查询缓存， 服务器设置优化， 操作系统和硬件优化， 应用层优化 等等。 
+查询开销指标： 执行时间  ， 检查行数   ，  返回行数。
 
 
-2. 在索引字段上使用运算会使索引失效。 （用事实说话， 测试案例见skynet)
-   利用limit限制1行的情况， 如果一张表只需要取得一条数据。 
+索引优化。 
+聚簇索引和非聚簇索引。 
+聚簇索引将数据与索引放在一起。 
+非聚簇索引将数据与索引分开，数据放置在叶节点上。 
+主键索引（primary key）alter table xx_tbl add primary key(column)
+唯一索引（unique key）create unique xx on table（column）, alter table xx_tbl add unique（col）
+普通索引（index）alter table xx_tbl add index index_name(col)
+全文索引（fulltext）alter table xx_tbl add fulltext（col）， 针对myisam
+组合索引  alter table xx_tbl add index  index_name(col1, col2, col3, ...）
 
-   
+########  mysql的配置文件  ##########
+find / -name my.cnf  #查看进程id的目录， 错误日志的目录， mysql.sock 的目录。 
+ps -ef |grep mariadb  #查看个目录的位置
+show variables like 'log_error';     # 查看错误日志文件的路径
+show variables like 'socket';
+show variables like 'datadir' ;  #mysql数据存储路径
+show variables like 'log_%';  #查看所有日志的路径
+
+##  开启一般查询日志 ##
+set global general_log_file='/var/log/mariadb/mariadb-general.log'; #设置一般查询的日志名称。 
+set global general_log=on;  #开启general log 模式
+set global general_log=off;  #关闭general log 模式
+
+## 开启慢查询日志  ##
+show variables like 'slow_query_log%';  #查看慢查询相关参数
+show variables like 'long_query_time';  #查询超过多少秒才记录
+slow_query_log #慢查询是否开启。 
+slow_query_log_file # 慢查询存放的目录。 
+long_query_time #超过多少秒记录，算作慢查询。 
+
+
+2. 在索引字段上使用运算会使索引失效。 （用事实说话， 测试案例见skynet) 
+   利用limit限制1行的情况， 如果一张表只需要取得一条数据。
+
+
+3. mysql的锁有哪些，各自的特点以及应用场景。
+
+
+4. mysql的事务机制。 
+    事务特性。 脏读。 幻读。  不可重复读。  事务隔离。  并发事务。  事务的实现原理。 
+
+
+5. mysql的日志。 
+    错误日志。  查询日志。   慢日志。   redo log (重做日志） 。  binlog (归档日志）。  undo log (回滚日志）。
+
+
+6. mysql的索引。 
+    模糊查询与索引。   唯一索引和普通索引的性能对比。   全局索引。   聚集索引对比非聚集索引。  最左匹配原则。   前缀索引。 
+    存储算法。   优化器如何选择索引。    不使用索引的原因列举。 
+
+
+7. mysql通用模块。 
+    查询内部执行过程。 查询缓存。  表空间。   表收缩。  前置索引。  回表查询。  
+    内存表和临时表。   删掉表的几种方法和性能对比。   数据类型的区别。   count(1)/ count(*) / count(字段）性能对比。 
+    视图。  删掉数据恢复和原理分析。   数据库引擎（innodb , myisam） , 数据结构。 
+
+8.mysql的高性能。 
+   慢查询的排查。 读写分离。  主备无延迟。   多实例配置。   水平分区。   性能分析。 
+
+
+9. 开放性问题。 
+   超级大表优化。  主从延迟分析。   误删防范。   高性能服务器设计。   
+
+
+  
