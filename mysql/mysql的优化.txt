@@ -32,6 +32,7 @@ show variables like 'long_query_time';  #查询超过多少秒才记录
 slow_query_log #慢查询是否开启。 
 slow_query_log_file # 慢查询存放的目录。 
 long_query_time #超过多少秒记录，算作慢查询。 
+set global slow_query_log=on; #开启慢查询日志。 
 
 
 2. 在索引字段上使用运算会使索引失效。 （用事实说话， 测试案例见skynet) 
@@ -39,11 +40,71 @@ long_query_time #超过多少秒记录，算作慢查询。
 
 
 3. mysql的锁有哪些，各自的特点以及应用场景。
+    blog地址：https://blog.csdn.net/why15732625998/article/details/80439315
+	     https://segmentfault.com/a/1190000014133576
+    表级锁。 表级锁又分为 共享读锁 和 独占写锁。 
+    lock table  shop  read;   #给表shop上读锁。 当前session可以进行读操作，不能进行写操作，而且不能对其他表操作。 其他session对锁定的表可以进行读操作， 不能
+    进行写操作， 进行写操作时会一直阻塞，直到锁被释放， 可以对未锁定的表进行读写操作。 
+    lock table  shop  write;  #给表shop上写锁。 当前session可以进行读写操作，不能对其他表操作。 其他session不能对写锁定的表进行操作， 操作会出现阻塞， 
+    直到解锁为止， 可以对未上锁的表进行读写操作。 
+    unlock tables;   #解锁。 
+    给shop表上锁之后，不能对其他表进行读写操作了。 表级锁的特点：粒度大，并发度低。 但是表级锁出现死锁情况少。 
+    引擎myisam是表级锁。 选择使用myisam， 进行读操作时，会自动加上读锁，相当于执行了 lock table  shop read;  进行写操作的时候， 会自动加上写锁。 
+    相当于执行lock table shop write; 
 
+    行级锁。开销大，加锁慢； 会出现死锁；锁粒度最小， 发生锁冲突的概率最低， 并发度最高。 适用在大量的并发环境下选择使用innodb引擎。 
+    select * from shop lock in share mode;  
+    select * from shop for update; 
+    行级锁又分为共享锁（s） 和 排他锁（x）; 
+    innodb 使用表级锁和行级锁。 默认使用行级锁。 
+    innodb 与 myisam 最大的区别是innodb支持行级锁和支持事务。 
+    ##行级锁的演示。 
+    show   variables  like 'autocommit';    #查看
+    set  autocommit = 0;  #关闭操作后的自动提交。  set autocommit =1; #恢复自动提交的按钮
+    session1 下。 update shop set price = 1 where id = 1; #  实际并没有提交，需要手动提交。 
+    session2 下。 select * from shop 。 #还是之前的值，表明在session1下的update并没有修改。 
+    在session2 下执行改动操作。  update shop set price = 10 where id = 1; # 会阻塞， 因为在innodb下执行写操作时上了写锁。 
+    在session1 下执行commit。 
+    行级锁在索引的那一列加锁。 对于在非索引列使用查询时，不会上锁。 
+
+    页级锁。 开销，锁粒度，并发度都是介于表级锁和行级锁之间。 bdb引擎默认使用页级锁。 
+
+    悲观锁， 乐观锁。 
+    乐观锁 假设在大并发更新，访问，处理数据时不会发生冲突， 采用不加锁的机制处理， 在更新数据时根据版本号，时间戳判断数据是否冲突，有则处理。 
+    悲观锁 假设在大并发访问，处理数据时采用加锁机制， 等待事务提交或者回滚， 释放锁。 
+
+    innodb 加锁机制：乐观锁 和 悲观锁。 
+                锁粒度： 表级锁， 行级锁， 页级锁。 
+                兼容性： 共享锁， 排他锁。  
+                锁模式：记录锁， gap锁， next-key 锁， 意向锁， 插入意向锁。 
+
+    MVCC 的机制和实现原理。 
+    
 
 4. mysql的事务机制。 
     事务特性。 脏读。 幻读。  不可重复读。  事务隔离。  并发事务。  事务的实现原理。 
+    
+    事务的基本要素：ACID,  原子性， 一致性， 隔离性， 持久性。 
 
+    事务的并发问题：脏读， 不可重复读， 幻读。 
+    脏读：读取了别人没有提交的数据。 事务A读取了事务B更新后的数据，但是事务B并没有提交，事务B这时回滚了数据， 导致事务A读取的数据跟事务B的实际数据不一致。 
+    不可重复读：多次读取同一条数据时，这一条数据做了改动， 导致多次读取时的数据不一致。区别于脏读的是这条数据更新之后是已经提交了。 事务A多次读取同一条数据，
+                       事务B做了修改并提交了， 但是事务A多次读取的数据不一致。 不可重复读针对的是对某一条数据的修改。 
+    幻读：更新某个表的数据时，被另外一操作修改了这个 表。 innodb引擎虽然可以锁住行，但是对于插入和增加这样的操作没有锁， 任然可以进行， 导致数据增加或减少的情况，类似
+             于人的幻觉。  
+    不可重复读使用行级锁可以解决。 幻读必须使用表级锁。 
+
+    事务的隔离级别： 读未提交（read-uncommitted）, 读已提交（read-commited）， 可重复读（read-repeated）, 串行化（serialize）
+    select @@tx_isolation;  #查看数据库的隔离级别。
+    read-uncommited   读取了未提交的数据。 脏读， 不可重复读， 幻读。 
+    read-commited   读取提交了的数据。 不会产生脏读。 有不可重复读， 幻读。 
+    read-repeated  可重复度。 不会产生脏读 和 不可重复读， 会产生幻读。 
+    serialize   序列化。  以上并发问题都不会产生。  
+
+    set session transaction  isolation level  read uncommitted;  #将事务隔离级别设置为读未提交
+    set session transaction  isolation level  read committed;  #将事务的隔离级别设置为读已提交
+    set session transaction  isolation level  repeatable read;  #将事务的隔离级别设置为可重复读。 
+    
 
 5. mysql的日志。 
     错误日志。  查询日志。   慢日志。   redo log (重做日志） 。  binlog (归档日志）。  undo log (回滚日志）。
@@ -58,6 +119,8 @@ long_query_time #超过多少秒记录，算作慢查询。
     查询内部执行过程。 查询缓存。  表空间。   表收缩。  前置索引。  回表查询。  
     内存表和临时表。   删掉表的几种方法和性能对比。   数据类型的区别。   count(1)/ count(*) / count(字段）性能对比。 
     视图。  删掉数据恢复和原理分析。   数据库引擎（innodb , myisam） , 数据结构。 
+
+    分表的实现以及在什么情况下需要实现分表功能？
 
 8.mysql的高性能。 
    慢查询的排查。 读写分离。  主备无延迟。   多实例配置。   水平分区。   性能分析。 
