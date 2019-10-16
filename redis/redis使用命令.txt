@@ -1,0 +1,2 @@
+redis-cli -h host -p port -a passwd   # 主机， 端口， 密码登录。 
+redis-cli -h host -p port -a passwd info | grep config  #  查看redis的配置文件
