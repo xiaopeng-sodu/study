@@ -1,5 +1,7 @@
-xiaopeng-sodu = xiaopeng823303
+github账号=密码：xiaopeng-sodu = xiaopeng823303
 将本地代码push到remote github
+mkdir study
+cd study 
 git init
 git add *
 git commit -m "first commit"
@@ -10,3 +12,26 @@ git push -u  origin master
 git add *   
 git commit -m "xxx"   
 git push -u origin master 
+
+1. 比较两个版本的差异。 git diff branch1  branch2  具体文件的目录。
+
+   例如：git diff v1.7 v2.0 ./svr_game/game/mods/hs_fish.lua  # 比较v1.7 和 v2.0 文件hs_fish.lua 的差异。 
+   git branch -a    #显示所有分支
+   git diff branch1  branch2 --stat   #显示两个版本所有有差异的文件列表
+ 
+   git diff fe88c64 4dba581 --stat  #显示修改的文件
+   git diff  hash1  hash2  --stat  # hash1   hash2  为版本的commit id 
+   git diff  <commit id1> <commit id2> 
+   git rev-parse  HEAD  #获取完整的commit id 
+   git rev-parse --short HEAD #获取short commit id 
+
+2 . git 的初步使用。 
+    git clone 地址
+    git branch  #显示当前的git路径
+    git checkout -b  v1.7  origin/v1.6    #以代码库的v1.6版本为原始版本，创建v1.7, 并切换到v1.7版本
+
+   举例：git clone http://git.awyun.net/2d-fish-casual/svr.git
+             git branch  # 当前版本
+             git checkout -b v2.1 origin/v2.1  #以仓库的版本v2.1为基础，check到本地版本号v2.1 , 基本形式：git checkout -b  本地的版本   远程仓库的版本
+             如果不知道仓库的版本， 使用git branch -a   # 显示仓库所有的版本号
+             如果想切到前面的某一个版本， 使用  git  checkout -b v2.1 origin/v.2.0   # v.2.0一定是仓库的某一个版本号
