@@ -1,0 +1,37 @@
+1. 整型。 
+   tinyint  # 1个字节， -128~127 ， 0~255
+   smallint # 2个字节
+   mediumint  #3个字节
+   int  #4个字节
+   bigint #5个字节
+
+2.  浮点数和定点数
+    float # 单精度浮点数， 4个字节。
+    float(m, n) , m 表示该值的总长度， n 表示小数点位数。 
+    double #双精度浮点数， 8个字节。 
+    double(m, n)， m 表示该值的总长度， n表示小数点位数。 
+    decimal   #定点数
+    decimal(m, n) 如果 m >n ，则字节数为m+2,  如果 n > m , 则字节数为 n +2； 
+    定点数是更加精确的计数。 money decimal(m , d) not null; 
+
+
+3. 时间类型。 
+    timestamp  #CURRENT_TIMESTAMP 默认当前的时间戳
+    datetime
+    date
+    time
+    year 
+
+4. 字符串类型。 
+    char  #定长字符串 0-255字节
+    varchar  #变长字符串 0-255字节
+    blob # 二进制长文本文件 0-65535字节， 64kb
+    text #  长文本文件 0-65535字节， 64kb
+    tinyblob #短二进制文本文件， 0 - 255字节。
+    tinytext #短文本文件， 0 -255字节。 
+    mediumblob 
+    mediumtext
+    longblob
+    longtext
+    
+  
