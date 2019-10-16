@@ -1,3 +1,6 @@
+
+#记录linux系统遇到的一些坑。 方便今后翻阅查询。 
+
 1. vm报错， 将安装目录下的xx.vmx文件里的vmci0.present = "FALSE"
 2. windows系统里面的服务vm anthor server 开成自动重启， windows重启
 参考博客：https://blog.csdn.net/w462666131/article/details/89914381

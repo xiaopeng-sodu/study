@@ -1,3 +1,6 @@
+
+# linux网络编程相关的api
+
 1. <sys/epoll.h>  #epoll  IO多路复用技术
    int epoll_create(int sz); 
    int epoll_ctl(int epfd, int opt, int sock, struct epoll_event*ev); 
