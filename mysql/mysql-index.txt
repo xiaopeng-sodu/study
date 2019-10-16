@@ -1,0 +1,74 @@
+#mysql 索引。 
+
+博客； https://www.jb51.net/article/140749.htm
+
+1，主键索引 primary key 
+    语法：
+    primary key(userid), #在userid列上建立主键索引。 
+    主键索引自动建立唯一索引。 一张表只有一个主键索引。 所以主键索引也是唯一的。 
+
+2. 唯一索引
+语法：
+unique key(id);  #在建表时定义
+create unique id on users(id);    # 在表users 里创建列id的索引
+create unique userid on users(userid); 
+create unique indexname on tablename(column); # 基本语法， 在某一个表的某一列创建索引。 
+
+alter table users add unique userid on(userid);  #更爱users表，在userid建立表。 
+alter table users add unique id on(id); # 更改users表，在id列建立唯一索引。
+alter table table_name add unique uniquename  on(column);   #更改表table_name , 在列column 建立唯一索引。 
+
+drop index  userid on users;  #删掉表users里的索引userid。 
+show index  from tblname ; #查看表tblname 的索引。 
+
+唯一索引要求每一列的数值不同， 具有唯一性。 
+
+3. 普通索引
+key(id) 
+index(id)
+create index id on tblname(column);  #在表tblname 的column列创建索引id； 
+alter table users add index on(id); #在表users里创建索引id； 
+
+5. 磁盘IO 与 预读。 
+   磁盘预读数据靠的是机械运动。 每次读取数据花费的时间包括寻道时间， 旋转延迟， 传输时间。 每次磁盘IO的操作是非常昂贵的操作。 
+   需要尽量减少磁盘IO的次数。 
+
+6. 索引的数据结构。 
+    b+树。 
+    每次查找数据时把磁盘IO次数控制在一个很小的数量级， 最好是常量级。 
+    b+树只在叶子节点存放真实的数据。 在非叶子节点存放非真实数据和磁盘块指针。 应该尽量减少树的高度， 从而来减少磁盘IO次数。 
+    b+树的性质。 
+    1. 索引的字段应该尽量的小。 磁盘IO的次数取决于b+树的高度。 h = log(m+1)N, N表示数据量， m越大，h越小。 m=磁盘块的大小/
+     数据项的大小。 实际上m表示每一个磁盘块存放的数据的数量。 磁盘块的 大小是固定的4k或者8k，取决于操作系统。 
+
+    2. 索引最左匹配特性。 
+
+
+7. 聚集索引 和 非聚集索引。 
+
+
+
+8. 索引的两大类型。 
+   hash  b-tree。 
+
+
+9. 索引的优化。 正确使用索引。 
+  1. 范围的问题， 或者条件不明确的情况。 条件中出现关键字：> , >=, < , <=, !=, between ... and ... , like. 
+     一个原则， 如果检索的范围很大，将会出现全表扫描， 性能很低。 
+
+   例如：select count(*) from s1 where id = 1000; #明确指明id， 检索的速度很快。 
+            select count(*)  from table where id > 1000;  # 没有明确指明哪一个，或者几个id， 引擎会从1001开始扫描， 如果数据很大将会
+             出现 全局扫描。 
+           select count(*) from tabl where id > 1000 and id <2000; #速度很快。 
+      
+     ！= 
+
+      between  ... and ...
+
+       like 
+
+
+       and  or . 
+
+
+
