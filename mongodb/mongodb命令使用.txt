@@ -11,11 +11,23 @@ db.users.ensureIndex({gender:1, user_name:1})  创建索引
 db.users.createIndex({id:1, user_name:1})  创建索引
 db.users.ensureIndex({"userid":1}, {"unique": true})  创建唯一索引
 db.users.getIndexes.find()  查找索引
-db.users.dropIndex("id") 销毁索引
-单个索引、复合索引
+db.users.dropIndex("id") 销毁索引 
+单个索引、复合索引 
 db.users.find({id:100100}).explain("executionStats") 对查询语句的解释
 db.stats() 
-db.base.find().pretty().limit(1)  查看表的成员
-db.currentOp()  查看当前的数据库状态
-db.dropDatabase() 删掉当前数据库
-db.user_info.save({"name": "xiao_peng"}) 建表
+db.base.find().pretty().limit(1)  查看表的成员 
+db.currentOp()  查看当前的数据库状态 
+db.dropDatabase() 删掉当前数据库 
+db.user_info.save({"name": "xiao_peng"}) 建表 
+
+mongo --host 172.16.0.186 --port 3717 admin -u awdbwebuser -p 6CaQGmzZWthRqwVCJchc --authenticationDatabase admin  #通过认证连入
+认证连入mongo的方法：
+mongo --host ip  --port port  admin -u 用户 -p passwd 
+mongo --host ip  --port port  admin -u 用户 -p passwd
+
+1. mongodb 创建数据库 和 表。
+   skynet为空数据库。 使用use skynet。 然后， db.test_tbl.insert({"name": "xiaopeng"}); 
+
+mongodb 命令相关操作的博客：https://www.jianshu.com/p/19636d35a761
+2. 数据库。 
+   use  test_db; 
