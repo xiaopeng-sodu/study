@@ -35,3 +35,14 @@ git push -u origin master
              git checkout -b v2.1 origin/v2.1  #以仓库的版本v2.1为基础，check到本地版本号v2.1 , 基本形式：git checkout -b  本地的版本   远程仓库的版本
              如果不知道仓库的版本， 使用git branch -a   # 显示仓库所有的版本号
              如果想切到前面的某一个版本， 使用  git  checkout -b v2.1 origin/v.2.0   # v.2.0一定是仓库的某一个版本号
+
+
+3. 对于项目的使用。
+  提交步骤：git  pull   #先拉取
+                  git branch    #当前分支   git branch -a   #  当前的所有分支
+                  git add .  #提交所有更改的文件， git add xx , #提交指定的文件
+                  git commit  -m "add modify"   #提交
+   	  git push #push 到仓库。 
+	  
+	  git config --global user.name "name”#显示提交的作者名字
+
