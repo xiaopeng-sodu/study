@@ -1,0 +1,9 @@
+git clone https://github.com/redis/hiredis.git
+make 
+make install 
+
+cp  libhiredis.so   /usr/lib 
+cp  libhiredis.so   /usr/local/lib64
+ldconfig
+
+#include <hiredis/hiredis.h>
