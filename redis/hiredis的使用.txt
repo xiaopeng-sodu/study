@@ -1,3 +1,4 @@
+###### hiredis 的安装 ###############
 git clone https://github.com/redis/hiredis.git
 make 
 make install 
@@ -7,3 +8,10 @@ cp  libhiredis.so   /usr/local/lib64
 ldconfig
 
 #include <hiredis/hiredis.h>
+
+1. api  的介绍。 
+   redisContext * redisConnect(const char * ip, int port);  # 与redis服务器建立连接
+   void * redisCommand(redisContext * c, const char * format, ...);   # 执行redis的命令
+   redisFree(redisContext *ctx);  
+   freeReplyObject(reply);   #释放struct redisReply ； 
+   redisGetReply(void **) #获得struct redisReply结构体； 
