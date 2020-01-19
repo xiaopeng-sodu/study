@@ -210,6 +210,31 @@ ping #### 验证服务器是否连通
    hsetnx key field1 value1
    hexists key field
    hlen key 
-   
+  
+   10. redis的压力测试工具 redis-benchmark  
+         ln -s    ./redis-benchmark    /usr/loca/bin/redis-benchmark
+         redis-benchmark -h 127.0.0.1 -p 6379 -c 50 -n 10000 -t get
+         redis-benchmark -h 127.0.0.1 -p 6379 -c 50 -n 10000 -t set  
+
+        -h  主机ip  ，  -p   主机端口，   -c 客户端数，   -n 请求次数，  -q 放弃简单信息， 只打印每秒处理请求的个数
+        -t 类型， 例如-t set 只显示set的信息， -t lpush 只显示lpush信息
+
+11. 缓存预热  缓存降级   缓存更新
+     
+
+
+12. redis的强一致性和分布式锁的使用。
+
+
+13.redis开机启动的配置。 （完全使用shell脚本实现）
+   cp  redis_init_script   /etc/init.d  #将redis_init_script 复制到/etc/init.d下面
+   cp  redis_init_script  redis_6379  #复制一份， 将redis_6379理解成一个service
+   修改redis_6379里面的配置
+   chkconfig  redis_6379  on   #将6379端口的redis设置为开机启动
+   service  redis_6379  start   #redis启动
+   service  redis_6379  stop   #redis停止
+
+14 . 获取redis的所有key， 使用命令： keys *
    
       
+
