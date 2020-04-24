@@ -1,0 +1,64 @@
+binlog , redolog, undo log， 
+
+binlog, undo log是逻辑日志， redolog 是物理日志。 
+物理日志存储了数据被修改的值。 是被sql语句修改之后的值。 
+逻辑日志存储了逻辑sql修改的语句。 
+
+mysql有7种日志。 
+重做日志 （redo log）
+回滚日志  （undo log）
+二进制日志  （binlog）
+错误日志 （errorlog）
+慢查询日志 （slow query log）
+一般查询日志 （general log）
+中继日志 （relay log）
+ 
+1. mysql宕机了使用的是redolog 还是binlog ?
+   mysql宕机后使用redolog恢复数据， redolog叫重做日志文件，用于记录事务操作的变化， 记录的是数据修改之后的值。
+   数据库宕机后，innodb使用redolog恢复到宕机之前的时刻，以此保证数据的完整性。 
+ 
+   是因为redolog 分为两部分， redolog-buffer 和 redolog， 前者记录在内存中， 后者记录下磁盘上。 
+   事务分成两个阶段， prepare阶段和commit阶段。 
+   prepare阶段是语句的执行， 数据会写到内存data-buffer， 对应的数据会记录在redolog-buffer，
+   data-buffer是异步写，后台线程会在空闲的时候将数据同步到磁盘上。  
+   commit阶段是所有的语句执行完了之后，  提交。 提交成功， redolog-buffer的数据  
+   同步到redolog， 同时binlog记录所有操作。 redolog 是前滚日志， 如果mysql宕机了，这时后台线程还没完全将data-buffer的数据同步到磁盘， 使用redolog
+   重做，恢复数据。 
+   从redolog-buffer(重做日志缓存）同步到 磁盘 redolog上， 可以选择在事务提交的时候， 也可以选择在之后同步。 后面同步有可能造成数据库服务器的数据丢失，
+   假如服务器宕机了，redolog还没完成同步，就会丢失数据。 
+
+
+2. redolog刷入磁盘的过程。 
+    buffer-pool,   relog-log-buffer,   reglog-log-file,    
+    对数据库的操作，是在内存上执行的。 读写数据之前，先将磁盘的数据写入内存，预热过程。 
+    开启事务
+    
+
+
+2. 主从复制的原理。 
+   一主一从。 一主多从。 
+   master服务器进行写， slave服务器进行读。 减轻主服务器的压力。 如果对数据的实时性要求很高，在master服务器读。 
+   master服务器进行的写操作。 将写sql语句（update， delete， insert）写到binlog 日志。
+   slave服务器连接请求到达master服务器， master服务器创建binlog-dump线程， 将master服务器的binlog日志复制到
+   slave服务器。slave服务器创建两种线程， I/O线程负责将binlog复制到本地relaylog， sql线程负责处理relaylog日志并
+   执行。 
+
+   步骤1， 主库db的更新事件（update， delete， insert）被写到binlog。 
+   步骤2， 从库发起连接， 连接到主库。 
+   步骤3， 主库创建binlog dump thread， 把binlog的内容发送打从库。 
+   步骤4， 从库启动后，创建一个I/Othread， 读取主库传过来的binlog内容并写到relay log。 
+   步骤5， 创建一个sql线程， 从relay log里面读取内容， 更新事件， 将更新内容写到slave的db。 
+
+
+3. 事务的四个特性怎么实现，实现原理。 
+
+
+
+4. 事务隔离级别的实现原理。 
+
+
+5. MVCC 的原理。 
+
+
+
+

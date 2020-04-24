@@ -22,7 +22,7 @@
     time
     year 
 
-4. 字符串类型。 进入游戏场失败
+4. 字符串类型。
     char  #定长字符串 0-255字节
     varchar  #变长字符串 0-65535字节
     查询效率：char > varchar > text

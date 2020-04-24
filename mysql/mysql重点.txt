@@ -1,0 +1,97 @@
+
+mysql主要分 索引， 事务， 日志， 锁， 操作命令和内置函数，  性能优化和分布式。 
+
+1. drop , truncate , delete 的区别？
+
+    DML是数据操作语言。 DDL是数据定义语言。 
+    delete是DML, 是有回滚日志, 记录下undolog里面。 
+    truncate是DDL， 没有回滚日志， 一旦删掉数据，不可恢复。 
+    drop是删掉表结构和表数据，是DDL， 没有回滚日志， 不可以恢复。 
+
+2. innodb 和 myisam 的区别？
+
+   innodb是行级锁。 myisam是表级锁。 
+   innodb支持事务。 myisam不支持事务。 
+   innodb适合大量的写入操作，并发度高。 
+
+3. 聚集索引和非聚集索引的区别？
+
+    聚集索引顾名思义索引和数据聚集在一起。 
+    索引的逻辑顺序和数据块的物理顺序一致。例如索引1，2，3。对应的数据块在物理顺序上是连续的。 查询数据的时候，不是直接在磁盘上查找
+    某一个索引对应的数据，是找到对应的数据页，将数据页加载到内存里，然后在内存里用二分查找法查找对应的value。 
+    关系型数据库如此得名。 查找某一个key对应的value时，其附近的key的数据也可能会查到。附近的数据会随着整个页加载到内存里。 
+    非聚集索引就是索引的逻辑顺序和数据块的物理地址不是连续的。 包括普通索引， 唯一索引， 全文索引，外键索引。 
+    非聚集索引的叶子节点存放的是主键索引的值。索引使用普通索引查找的时候， 需要进行二次查找。 先找到对应的主键，然后找到对应的数据。
+
+4. B树和B+树的区别？
+
+    b树的非叶子节点存放数据。 b+树只在叶子节点存放数据。 
+
+5. 主从复制的原理？
+
+        mysql主从复制就是把主服务器的数据复制到从服务器上。
+        master服务器的所有写操作记录在binlog，是一个二进制文件。 slave服务器将binlog日志从master服务器拷贝过来，执行，就完成对master服务器
+   数据的同步。 
+        完成主从复制需要3个线程：master的binlog-dump线程， slave的IO线程和sql线程。 
+        slave与master建立连接。 master的binlog-dump线程将binlog日志通过socket传输通道传送到slave。slave接受到binlog后，使用IO线程将binlog
+   存入relaylog， 然后sql线程执行relaylog，完成对数据的同步。 
+        1. slave服务器连接master服务器，建立一条传输通道socket。 
+        2. master服务器产生一条binlog-dump线程，将binlog日志传输到slave。 
+        3. slave接收到binlog，产生一条IO线程，负责将binlog日志重做，转换成可执行的sql语句，并存放在relaylog。
+        4. slave产生一条sql线程，负责执行relaylog的sql语句。 
+   mysql的主从复制包含3种线程，2种日志。 binlog线程， io线程， sql线程。 binlog日志， relaylog日志。 
+
+6. mysql有哪几种日志？
+
+    1.  binlog， 二进制日志， 记录所有写操作。主要用于主从复制。 属于mysql-server层。 逻辑日志。 
+    2.  redolog ，重做日志， 属于物理日志，是对物理页的修改。 属于引擎层innodb。 
+    3.  undolog，回滚日志， 属于引擎层。 
+    4.  relaylog， 中继日志，  是binlog日志的转换， 用于主从复制功能。 
+    5.  errorlog ，错误日志。 
+    6.  slow-query-log, 慢查询日志。 
+    7.  gernel-log, 一般日志。 
+
+7. 事务的几种特性？几种隔离级别？什么是脏读，不可重复读， 幻读？
+    原子性，一致性， 隔离性， 持久性。 
+
+8. mysql有哪几种线程？
+
+9. mysql的三大范式是什么？
+
+10. mysql有哪几种锁？
+
+11. MVCC的原理？
+
+12. 乐观锁和悲观锁？乐观锁的实现原理? 什么是CAS(compare and swap) ？
+
+13. mysql的分表和分库。 
+
+14. redolog日志和binlog日志的区别？
+
+15. mysql查询语句执行的过程是怎么样？
+
+16. redolog 刷入磁盘的过程？
+
+17. mysql语句优化的方法？
+
+
+redis的重点。 
+
+1. redis的持久化。aof 和 rdb 区别，原理。 aof重写机制。 
+
+2. redis的主从复制原理。 
+
+3. redis的哨兵机制。 
+
+4. redis的集群机制。 
+
+5. redis的一致性哈希。 
+
+6. 雪崩， 击穿， 穿透的解决方案。 
+
+7. redis有哪几种数据过期淘汰策略和内存淘汰策略。
+
+8. 分布式锁的应用场景以及实现。 基于zookeeper以及基于redis二种。 
+   
+
+

@@ -1,17 +1,29 @@
 1,  mysql导出数据库的几种方法。
-     mysqldump -uroot -p123456 db_name >db_name.sql 
+     mysqldump -uroot -p123456 db_name >db_name.sql  #导出数据库db_name的所有的表。 
+     mysqldump -uroot -p123456 db_name table > table.sql  #导出数据库db_name的表table
 
-
+     
 
 2. mysql修改索引
     create index index_name on table(column_name);   
     alter table tablename add index  index_name(column_name); 
 
+    alter table table_name modify userid tinyint not null;             #修改表table_name的userid 的数据属性。 
+    alter table table_name add money decimal(20, 4) not null ; 
 
 
   select version(); #查看版本；
 
   建表的时候在设置有auto_increment 的行， 不要设置该行为默认值， 否则报错。 
-  例如。 userid int unsigned not null auto_increment comment "xxx"  正确；
+  例如:  userid int unsigned not null auto_increment comment "xxx"  正确；
             userid int unsigned not null default 0 auto_increment comment "xxx  错误； 
+
+3. 远程服务器登录mysql的授权。 
+   grant all privileges on *.* to "root"@"%" identified by "123456" with grant option; 
+   #将本服务器的所有数据库的所有表  授权给 所有远程服务器的root用户 通过密码123456来登录。 
+   flush privileges  # 刷新
+   
+   revoke create on *.* from "root"@"%";   #回收权限。 
+   flush privileges; 
+   
  
